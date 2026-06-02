@@ -1,0 +1,17 @@
+# Backups created by the setup script
+*.bak.*
+
+# Local credential / config files (never commit these)
+.env
+.codex/
+.aws/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Editor cruft
+*.swp
+*~
+.idea/
+.vscode/
