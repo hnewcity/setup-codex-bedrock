@@ -37,7 +37,8 @@ L() { if [ "$LANGV" = "en" ]; then printf '%s' "$2"; else printf '%s' "$1"; fi; 
 backup() {
   local f="$1"
   [ -f "$f" ] || return 0
-  local b="$f.bak.$(date +%Y%m%d%H%M%S)"
+  local b
+  b="$f.bak.$(date +%Y%m%d%H%M%S)"
   cp "$f" "$b" && c_dim "  $(L '已备份' 'backup'): $b"
 }
 
@@ -371,7 +372,7 @@ case "$AWS_DO" in
     command -v aws >/dev/null 2>&1 || die "$(L '未找到 aws CLI' 'aws CLI not found')"
     aws configure --profile "$AWS_PROF"
     aws configure set region "$REGION" --profile "$AWS_PROF"
-    c_green "  aws configure $(L 完成 done) (profile $AWS_PROF)"
+    c_green "  aws configure $(L 完成 'done') (profile $AWS_PROF)"
     ;;
   set)
     command -v aws >/dev/null 2>&1 || die "$(L '未找到 aws CLI' 'aws CLI not found')"
@@ -383,7 +384,7 @@ case "$AWS_DO" in
     ;;
   sso)
     command -v aws >/dev/null 2>&1 || die "$(L '未找到 aws CLI' 'aws CLI not found')"
-    aws sso login --profile "$AWS_PROF" && c_green "  aws sso login $(L 完成 done)"
+    aws sso login --profile "$AWS_PROF" && c_green "  aws sso login $(L 完成 'done')"
     ;;
 esac
 
