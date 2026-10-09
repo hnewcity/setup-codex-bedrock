@@ -60,8 +60,9 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock
 # 克隆后运行(推荐,带 -ExecutionPolicy Bypass 绕过脚本限制)
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
 
-# 或一行直接拉起(请先审阅脚本内容;开头先开 TLS 1.2,老版 PS 5.1 默认 TLS 1.0 会下载失败)
-[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
+# 或远程拉起:先下载到临时文件再用 -File 跑(请先审阅脚本内容)
+# 不要用 `irm ... | iex`:脚本带 UTF-8 BOM, 管道进 iex 会被 BOM 破坏首行而解析失败
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; $f=Join-Path $env:TEMP 'setup-codex-bedrock.ps1'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 -OutFile $f; & $f"
 ```
 
 > ⚠️ **跑不起来?** 若直接双击 `.ps1` 或用 `.\setup-codex-bedrock.ps1` 运行,报
@@ -139,8 +140,9 @@ Run in PowerShell (Windows PowerShell 5.1 or PowerShell 7):
 # After cloning (recommended; -ExecutionPolicy Bypass avoids the script-blocking policy)
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
 
-# Or in one line (review the script first; enable TLS 1.2 first — old PS 5.1 defaults to TLS 1.0 and the download fails)
-[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
+# Or remotely: download to a temp file first, then run it with -File (review the script first)
+# Do NOT use `irm ... | iex`: the script has a UTF-8 BOM that corrupts the first line when piped into iex
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; $f=Join-Path $env:TEMP 'setup-codex-bedrock.ps1'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 -OutFile $f; & $f"
 ```
 
 > ⚠️ **Can't run it?** If you double-click the `.ps1` or run `.\setup-codex-bedrock.ps1` and get
