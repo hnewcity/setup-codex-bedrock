@@ -11,8 +11,12 @@
    - 多目标: CLI(用户环境变量) / 桌面App·IDE(~/.codex/.env) / 两者
 
  用法 / Usage:
-   powershell -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
-   irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
+   [Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
+
+ 若提示 "无法加载,因为在此系统上禁止运行脚本" / If you see "running scripts is disabled on this system":
+   用上面带 -ExecutionPolicy Bypass 的命令, 不要直接双击或 .\ 运行。
+   Use the command with -ExecutionPolicy Bypass above; do not double-click or run via .\ directly.
 #>
 
 # 全部逻辑包在函数里: 通过 irm | iex 运行时不污染调用方会话, 也不会因 exit 关掉窗口
@@ -395,6 +399,8 @@ function Invoke-CodexBedrockSetup {
 
 $prevEncoding = $null
 try {
+  # PowerShell 5.1 (老版本 Win10) 默认 TLS 1.0, GitHub 只收 TLS 1.2+; irm|iex 会直接失败
+  try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch { }
   # PowerShell 5.1 控制台默认非 UTF-8, 中文会乱码
   try { $prevEncoding = [Console]::OutputEncoding; [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
   Invoke-CodexBedrockSetup

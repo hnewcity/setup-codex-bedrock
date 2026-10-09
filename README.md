@@ -57,12 +57,16 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock
 在 PowerShell(Windows PowerShell 5.1 或 PowerShell 7)中运行:
 
 ```powershell
-# 克隆后运行
-powershell -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
+# 克隆后运行(推荐,带 -ExecutionPolicy Bypass 绕过脚本限制)
+powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
 
-# 或一行直接拉起(请先审阅脚本内容)
-irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
+# 或一行直接拉起(请先审阅脚本内容;开头先开 TLS 1.2,老版 PS 5.1 默认 TLS 1.0 会下载失败)
+[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
 ```
+
+> ⚠️ **跑不起来?** 若直接双击 `.ps1` 或用 `.\setup-codex-bedrock.ps1` 运行,报
+> `无法加载 ... 因为在此系统上禁止运行脚本`,这是 Windows 默认的 ExecutionPolicy 限制。
+> 用上面第一条带 `-ExecutionPolicy Bypass` 的命令即可,无需改系统策略。
 
 与 bash 版的区别:
 
@@ -132,12 +136,16 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock
 Run in PowerShell (Windows PowerShell 5.1 or PowerShell 7):
 
 ```powershell
-# After cloning
-powershell -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
+# After cloning (recommended; -ExecutionPolicy Bypass avoids the script-blocking policy)
+powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
 
-# Or in one line (review the script first)
-irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
+# Or in one line (review the script first; enable TLS 1.2 first — old PS 5.1 defaults to TLS 1.0 and the download fails)
+[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
 ```
+
+> ⚠️ **Can't run it?** If you double-click the `.ps1` or run `.\setup-codex-bedrock.ps1` and get
+> `... cannot be loaded because running scripts is disabled on this system`, that's Windows' default
+> ExecutionPolicy. Use the first command above with `-ExecutionPolicy Bypass` — no need to change the system policy.
 
 Differences from the bash version:
 
