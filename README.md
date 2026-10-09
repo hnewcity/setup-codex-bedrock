@@ -6,6 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Shell](https://img.shields.io/badge/shell-bash-4EAA25.svg?logo=gnubash&logoColor=white)](setup-codex-bedrock.sh)
+[![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE.svg?logo=powershell&logoColor=white)](setup-codex-bedrock.ps1)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#贡献--contributing)
 
 ---
@@ -20,11 +21,12 @@
 
 - **交互式 + 双语**:全程中文 / English 提示,首屏选择语言。
 - **幂等**:用 marker 块管理写入内容,重复运行只更新不堆积。
-- **安全**:密钥隐藏输入、不回显;`~/.codex/.env` 自动 `chmod 600`;任何改动前自动备份原文件。
+- **安全**:密钥输入可见,便于核对;`~/.codex/.env` 自动 `chmod 600`;任何改动前自动备份原文件。
 - **多种认证方式**:
   - Bedrock API key(最简单,设置 `AWS_BEARER_TOKEN_BEDROCK`)
   - AWS SDK 凭证链:命名 Profile / AWS SSO / 长期 AK·SK / 临时凭证 / 联合身份(credential_process)
 - **多目标**:写入 CLI(shell rc)、桌面 App·IDE(`~/.codex/.env`),或两者都写。
+- **跨平台**:macOS / Linux 用 `setup-codex-bedrock.sh`,Windows 用 `setup-codex-bedrock.ps1`。
 
 ### 前置条件
 
@@ -49,6 +51,25 @@ bash setup-codex-bedrock.sh
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.sh)
 ```
+
+### Windows
+
+在 PowerShell(Windows PowerShell 5.1 或 PowerShell 7)中运行:
+
+```powershell
+# 克隆后运行
+powershell -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
+
+# 或一行直接拉起(请先审阅脚本内容)
+irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
+```
+
+与 bash 版的区别:
+
+- **CLI 目标**写入的是**用户级环境变量**(`[Environment]::SetEnvironmentVariable(..., 'User')`),而不是 shell rc。需要**新开终端窗口**才生效。
+- `%USERPROFILE%\.codex\.env` 用 `icacls` 设为仅当前用户可访问(相当于 `chmod 600`)。
+- 改用 AWS SDK 凭证时,会同时删除用户级的旧 `AWS_BEARER_TOKEN_BEDROCK`,避免 Codex 仍优先使用旧 key。
+- 桌面 App:完全退出(包括托盘图标)后重开。
 
 ### 让配置生效
 
@@ -75,11 +96,12 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock
 
 - **Interactive + bilingual**: prompts in Chinese / English, language picked on the first screen.
 - **Idempotent**: writes are wrapped in marker blocks, so re-running updates in place instead of piling up.
-- **Safe**: secret input is hidden and never echoed; `~/.codex/.env` is `chmod 600`; every file is backed up before changes.
+- **Safe**: key input is visible so you can verify it; `~/.codex/.env` is `chmod 600`; every file is backed up before changes.
 - **Multiple auth methods**:
   - Bedrock API key (simplest, sets `AWS_BEARER_TOKEN_BEDROCK`)
   - AWS SDK credential chain: named profile / AWS SSO / long-term AK·SK / temporary credentials / federated (credential_process)
 - **Multiple targets**: write to the CLI (shell rc), the desktop app/IDE (`~/.codex/.env`), or both.
+- **Cross-platform**: `setup-codex-bedrock.sh` for macOS / Linux, `setup-codex-bedrock.ps1` for Windows.
 
 ### Prerequisites
 
@@ -105,6 +127,25 @@ Or run it in one line (review the script first before doing this):
 bash <(curl -fsSL https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.sh)
 ```
 
+### Windows
+
+Run in PowerShell (Windows PowerShell 5.1 or PowerShell 7):
+
+```powershell
+# After cloning
+powershell -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
+
+# Or in one line (review the script first)
+irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 | iex
+```
+
+Differences from the bash version:
+
+- The **CLI target** writes **user-level environment variables** (`[Environment]::SetEnvironmentVariable(..., 'User')`) instead of a shell rc. Open a **new terminal window** for them to take effect.
+- `%USERPROFILE%\.codex\.env` is locked to the current user via `icacls` (the equivalent of `chmod 600`).
+- Switching to AWS SDK credentials also removes a stale user-level `AWS_BEARER_TOKEN_BEDROCK`, so Codex doesn't keep preferring the old key.
+- Desktop app: fully quit (including the tray icon), then reopen.
+
 ### Make it take effect
 
 - **Terminal (CLI)**: `source ~/.zshrc` (or your rc file), then run `codex` and use `/status` to confirm the provider is `amazon-bedrock`.
@@ -122,10 +163,10 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock
 
 ## 安全说明 / Security notes
 
-- 脚本永远不会把你的密钥回显到终端或日志。/ The script never echoes your secrets to the terminal or logs.
+- 密钥仅在输入时显示,脚本不会再把它打印到终端或日志;注意防窥屏。/ Keys are visible only while you type them; the script never prints them afterwards. Mind shoulder-surfing.
 - 长期 AK/SK 写入 `~/.aws`(通过 `aws configure set`),而不是 shell 文件。/ Long-term AK/SK are written to `~/.aws` (via `aws configure set`), not to shell files.
 - 临时凭证不会被写入任何文件。/ Temporary credentials are never written to any file.
-- `~/.codex/.env` 会被设置为 `600` 权限。/ `~/.codex/.env` is set to `600` permissions.
+- `~/.codex/.env` 会被设置为 `600` 权限(Windows 上为仅当前用户可访问)。/ `~/.codex/.env` is set to `600` permissions (current-user-only ACL on Windows).
 
 > ⚠️ 切勿把含密钥的 `~/.codex/.env`、`~/.aws` 或 shell rc 文件提交到版本库。
 > ⚠️ Never commit `~/.codex/.env`, `~/.aws`, or shell rc files that contain secrets.

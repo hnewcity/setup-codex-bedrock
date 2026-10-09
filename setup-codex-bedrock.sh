@@ -7,7 +7,7 @@
 # 特性 / Features:
 #   - 交互式 + 双语(中文 / English)
 #   - 幂等:marker 块管理,重复运行只更新不堆积
-#   - 安全:密钥隐藏输入、不回显;.env chmod 600;改动前自动备份
+#   - 安全:.env chmod 600;改动前自动备份
 #   - 多认证:Bedrock API key / AWS SDK 凭证链(profile·SSO·长期AKSK·临时·联合身份)
 #   - 多目标:CLI(shell rc) / 桌面App·IDE(~/.codex/.env) / 两者
 #
@@ -108,26 +108,26 @@ choose_region() {
   c_blue "$(L '==> 选择 AWS Region (Bedrock 上的 OpenAI 模型仅在美区)' '==> Choose AWS Region (OpenAI models on Bedrock are US-only)')" >&2
   if [ "$LANGV" = "en" ]; then
     cat >&2 <<'EOF'
-  1) us-east-2   (doc default)
-  2) us-east-1
-  3) us-west-2
+  1) us-west-2   (default)
+  2) us-east-2
+  3) us-east-1
   4) custom
 EOF
   else
     cat >&2 <<'EOF'
-  1) us-east-2   (文档默认)
-  2) us-east-1
-  3) us-west-2
+  1) us-west-2   (默认)
+  2) us-east-2
+  3) us-east-1
   4) 自定义
 EOF
   fi
   local r; r=$(ask "  $(L 选择 Choose)" "1")
   case "$r" in
-    1) printf 'us-east-2' ;;
-    2) printf 'us-east-1' ;;
-    3) printf 'us-west-2' ;;
-    4) ask "  $(L '输入 region' 'enter region')" "us-east-2" ;;
-    *) printf 'us-east-2' ;;
+    1) printf 'us-west-2' ;;
+    2) printf 'us-east-2' ;;
+    3) printf 'us-east-1' ;;
+    4) ask "  $(L '输入 region' 'enter region')" "us-west-2" ;;
+    *) printf 'us-west-2' ;;
   esac
 }
 
@@ -135,23 +135,22 @@ choose_model() {
   c_blue "$(L '==> 选择模型(可跳过,用默认)' '==> Choose model (optional, can skip)')" >&2
   if [ "$LANGV" = "en" ]; then
     cat >&2 <<'EOF'
-  1) openai.gpt-5.5  (default)
-  2) openai.gpt-5.4
-  3) leave model unset
+  1) leave model unset  (default)
+  2) openai.gpt-5.5
+  3) openai.gpt-5.4
 EOF
   else
     cat >&2 <<'EOF'
-  1) openai.gpt-5.5  (默认)
-  2) openai.gpt-5.4
-  3) 不写 model,用默认
+  1) 不写 model  (默认)
+  2) openai.gpt-5.5
+  3) openai.gpt-5.4
 EOF
   fi
   local m; m=$(ask "  $(L 选择 Choose)" "1")
   case "$m" in
-    1) printf 'openai.gpt-5.5' ;;
-    2) printf 'openai.gpt-5.4' ;;
-    3) printf '' ;;
-    *) printf 'openai.gpt-5.5' ;;
+    2) printf 'openai.gpt-5.5' ;;
+    3) printf 'openai.gpt-5.4' ;;
+    *) printf '' ;;
   esac
 }
 
@@ -219,8 +218,8 @@ AK=""; SK=""
 case "$AUTH" in
   1)
     echo
-    c_yellow "$(L '  请粘贴 Bedrock API key (输入隐藏,不回显):' '  Paste Bedrock API key (hidden input):')"
-    read -r -s -p "  AWS_BEARER_TOKEN_BEDROCK: " BEARER; echo
+    c_yellow "$(L '  请粘贴 Bedrock API key:' '  Paste Bedrock API key:')"
+    read -r -p "  AWS_BEARER_TOKEN_BEDROCK: " BEARER; echo
     [ -n "$BEARER" ] || die "$(L 未输入 key 'no key entered')"
     REGION=$(choose_region)
     BLOCK_CONTENT="export AWS_BEARER_TOKEN_BEDROCK='$BEARER'
@@ -282,8 +281,8 @@ export AWS_REGION='$REGION'
         HOW=$(ask "  $(L 选择 Choose)" "1")
         if [ "$HOW" = "1" ]; then
           AWS_PROF=$(ask "  $(L '写入哪个 profile' 'write to which profile')" "codex-bedrock")
-          read -r -s -p "  AWS_ACCESS_KEY_ID: " AK; echo
-          read -r -s -p "  AWS_SECRET_ACCESS_KEY: " SK; echo
+          read -r -p "  AWS_ACCESS_KEY_ID: " AK; echo
+          read -r -p "  AWS_SECRET_ACCESS_KEY: " SK; echo
           [ -n "$AK" ] && [ -n "$SK" ] || die "$(L 'AK/SK 不能为空' 'AK/SK must not be empty')"
           AWS_DO="set"
           BLOCK_CONTENT="export AWS_PROFILE='$AWS_PROF'

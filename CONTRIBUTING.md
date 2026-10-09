@@ -31,7 +31,7 @@ CI 会在每次 push 和 PR 上运行同样的检查。
 
 - **Keep it dependency-free.** The script should run with only `bash`, `awk`, `sed`, and `grep`. / **保持零依赖。** 脚本只应依赖 `bash`、`awk`、`sed`、`grep`。
 - **Idempotency matters.** Re-running the script must update in place, not duplicate. / **幂等很重要。** 重复运行必须就地更新,不能重复堆积。
-- **Never echo secrets.** Secret input stays hidden; don't print keys to stdout/logs. / **永不回显密钥。** 密钥输入须隐藏,不要打印到 stdout/日志。
+- **Never log secrets.** Key input is shown while typing, but don't print keys to stdout/logs afterwards. / **不要输出密钥。** 密钥输入时可见,但之后不要打印到 stdout/日志。
 - **Bilingual parity.** Every user-facing string should have both 中文 and English via the `L` helper. / **双语对等。** 每条面向用户的文案都要通过 `L` 辅助函数提供中英文。
 
 ## Reporting issues / 报告问题
