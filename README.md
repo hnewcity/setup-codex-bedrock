@@ -60,10 +60,14 @@ bash <(curl -fsSL https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock
 # 克隆后运行(推荐,带 -ExecutionPolicy Bypass 绕过脚本限制)
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
 
-# 或远程拉起:先下载到临时文件再用 -File 跑(请先审阅脚本内容)
-# 不要用 `irm ... | iex`:脚本带 UTF-8 BOM, 管道进 iex 会被 BOM 破坏首行而解析失败
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; $f=Join-Path $env:TEMP 'setup-codex-bedrock.ps1'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 -OutFile $f; & $f"
+# 或远程一行拉起:走纯 ASCII 的 install.ps1 引导(请先审阅脚本内容)
+irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/install.ps1 | iex
 ```
+
+> ⚠️ 远程请用 `install.ps1`,**不要**直接 `irm .../setup-codex-bedrock.ps1 | iex`:
+> 主脚本带 UTF-8 BOM(让 `-File`/双击在中文系统上正确解析),而 PS 5.1 的
+> `irm | iex` 会把 BOM 粘到首行 `<#` 前,导致注释块失效、整段中文被当代码解析报错。
+> `install.ps1` 是纯 ASCII 引导,先正确下载主脚本再用 `-File` 跑,规避了这个问题。
 
 > ⚠️ **跑不起来?** 若直接双击 `.ps1` 或用 `.\setup-codex-bedrock.ps1` 运行,报
 > `无法加载 ... 因为在此系统上禁止运行脚本`,这是 Windows 默认的 ExecutionPolicy 限制。
@@ -140,10 +144,15 @@ Run in PowerShell (Windows PowerShell 5.1 or PowerShell 7):
 # After cloning (recommended; -ExecutionPolicy Bypass avoids the script-blocking policy)
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
 
-# Or remotely: download to a temp file first, then run it with -File (review the script first)
-# Do NOT use `irm ... | iex`: the script has a UTF-8 BOM that corrupts the first line when piped into iex
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; $f=Join-Path $env:TEMP 'setup-codex-bedrock.ps1'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 -OutFile $f; & $f"
+# Or remotely in one line via the pure-ASCII install.ps1 bootstrap (review the script first)
+irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/install.ps1 | iex
 ```
+
+> ⚠️ Remotely, use `install.ps1` — do **not** pipe `setup-codex-bedrock.ps1` straight into iex.
+> The main script carries a UTF-8 BOM (so `-File` / double-click parse Chinese text correctly),
+> but PS 5.1's `irm | iex` prepends that BOM to the first line `<#`, breaking the comment block
+> so the whole header is parsed as code. `install.ps1` is pure ASCII: it downloads the main
+> script and runs it with `-File`, sidestepping the problem.
 
 > ⚠️ **Can't run it?** If you double-click the `.ps1` or run `.\setup-codex-bedrock.ps1` and get
 > `... cannot be loaded because running scripts is disabled on this system`, that's Windows' default

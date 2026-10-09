@@ -12,8 +12,8 @@
 
  用法 / Usage:
    powershell -NoProfile -ExecutionPolicy Bypass -File .\setup-codex-bedrock.ps1
-   # 远程: 下载到临时文件再 -File 跑 (勿用 irm|iex, BOM 会破坏首行)
-   powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; $f=Join-Path $env:TEMP 'setup-codex-bedrock.ps1'; irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/setup-codex-bedrock.ps1 -OutFile $f; & $f"
+   # 远程: 走纯 ASCII 引导 install.ps1 (勿直接 irm 本脚本|iex, BOM 会破坏首行)
+   irm https://raw.githubusercontent.com/hnewcity/setup-codex-bedrock/main/install.ps1 | iex
 
  若提示 "无法加载,因为在此系统上禁止运行脚本" / If you see "running scripts is disabled on this system":
    用上面带 -ExecutionPolicy Bypass 的命令, 不要直接双击或 .\ 运行。
